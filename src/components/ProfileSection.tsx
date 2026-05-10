@@ -15,7 +15,7 @@ const Camera = CameraIcon as any;
 const Save = SaveIcon as any;
 import { UserCard } from './UserCard';
 import { User as UserType } from '../types';
-
+import { StorageService } from '../services/storage';
 interface Props {
   user: UserType | undefined;
   agencies: UserType[];
@@ -28,6 +28,9 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
   const [dob, setDob] = useState(user?.dob || '');
   const [height, setHeight] = useState(user?.height || '');
   const [weight, setWeight] = useState(user?.weight || '');
+  const [skintone, setSkintone] = useState(user?.skintone || '');
+  const [experience, setExperience] = useState(user?.experience || '');
+  const [availability, setAvailability] = useState(user?.availability || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [role, setRole] = useState<'talent' | 'agency'>(user?.role || 'talent');
 
@@ -38,6 +41,9 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
       setDob(user.dob || '');
       setHeight(user.height || '');
       setWeight(user.weight || '');
+      setSkintone(user.skintone || '');
+      setExperience(user.experience || '');
+      setAvailability(user.availability || '');
       setBio(user.bio || '');
       setRole(user.role || 'talent');
     }
@@ -52,12 +58,14 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
     });
 
     if (!result.canceled) {
-      setAvatar(result.assets[0].uri);
+      const savedUri = await StorageService.saveMedia(result.assets[0].uri);
+      setAvatar(savedUri);
     }
   };
 
   const handleSave = () => {
     onSave({
+      ...user, // Retain existing properties like email, password, and sharedPhotos
       id: user?.id || Math.random().toString(36).substr(2, 9),
       name,
       avatar,
@@ -65,6 +73,9 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
       dob,
       height,
       weight,
+      skintone,
+      experience,
+      availability,
       bio,
       subscribedAgencies: user?.subscribedAgencies || [],
     });
@@ -93,7 +104,7 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
           value={name}
           onChangeText={setName}
           placeholder="Enter your name"
-          placeholderTextColor="#666"
+          placeholderTextColor="#9CA3AF"
         />
         <View style={styles.row}>
           <View style={[styles.inputGroup, { marginRight: 10 }]}>
@@ -103,7 +114,7 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
               value={dob}
               onChangeText={setDob}
               placeholder="DD/MM/YYYY"
-              placeholderTextColor="#666"
+              placeholderTextColor="#9CA3AF"
             />
           </View>
         </View>
@@ -116,7 +127,7 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
               value={height}
               onChangeText={setHeight}
               placeholder="e.g. 180"
-              placeholderTextColor="#666"
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
             />
           </View>
@@ -127,11 +138,43 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
               value={weight}
               onChangeText={setWeight}
               placeholder="e.g. 75"
-              placeholderTextColor="#666"
+              placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
             />
           </View>
         </View>
+
+        <View style={styles.row}>
+          <View style={[styles.inputGroup, { marginRight: 10 }]}>
+            <Text style={styles.label}>Skin Tone</Text>
+            <TextInput
+              style={styles.input}
+              value={skintone}
+              onChangeText={setSkintone}
+              placeholder="e.g. Fair, Medium, Dark"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Availability</Text>
+            <TextInput
+              style={styles.input}
+              value={availability}
+              onChangeText={setAvailability}
+              placeholder="e.g. Full-time, Weekends"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+        </View>
+
+        <Text style={styles.label}>Work Experience</Text>
+        <TextInput
+          style={styles.input}
+          value={experience}
+          onChangeText={setExperience}
+          placeholder="e.g. 5 years theater, 2 commercials"
+          placeholderTextColor="#9CA3AF"
+        />
 
         <Text style={styles.label}>Bio / Experience Summary</Text>
         <TextInput
@@ -139,7 +182,7 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
           value={bio}
           onChangeText={setBio}
           placeholder="Tell agencies about your acting journey..."
-          placeholderTextColor="#666"
+          placeholderTextColor="#9CA3AF"
           multiline
         />
 
@@ -177,7 +220,7 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F9FAFB',
   },
   header: {
     alignItems: 'center',
@@ -187,12 +230,12 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,
     borderWidth: 2,
-    borderColor: '#6200ee',
+    borderColor: '#4F46E5',
   },
   avatar: {
     width: 116,
@@ -203,14 +246,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
     padding: 8,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: '#FFFFFF',
   },
   title: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -218,19 +261,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   label: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 14,
     marginBottom: 8,
     fontWeight: '500',
   },
   input: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     borderRadius: 12,
     padding: 15,
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E7EB',
     marginBottom: 20,
   },
   row: {
@@ -244,7 +287,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   saveButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
     flexDirection: 'row',
     height: 56,
     borderRadius: 28,
@@ -254,7 +297,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,
@@ -264,7 +307,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   sectionTitle: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
@@ -279,16 +322,16 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     margin: '1.4%',
     borderRadius: 8,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
   },
   roleContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     borderRadius: 12,
     padding: 4,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E7EB',
   },
   roleButton: {
     flex: 1,
@@ -297,14 +340,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   activeRoleButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
   },
   roleButtonText: {
-    color: '#666',
+    color: '#6B7280',
     fontWeight: '600',
   },
   activeRoleButtonText: {
-    color: '#fff',
+    color: '#ffffff',
   },
   subscriptionSection: {
     marginTop: 20,

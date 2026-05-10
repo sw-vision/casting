@@ -49,8 +49,16 @@ export default function App() {
   };
 
   const handleCreatePost = async (newPostData: Omit<Post, 'id' | 'timestamp' | 'userId' | 'userName' | 'userAvatar'>) => {
+    let savedImageUri = newPostData.imageUri;
+    let savedVideoUri = newPostData.videoUri;
+
+    if (savedImageUri) savedImageUri = await StorageService.saveMedia(savedImageUri);
+    if (savedVideoUri) savedVideoUri = await StorageService.saveMedia(savedVideoUri);
+
     const newPost: Post = {
       ...newPostData,
+      imageUri: savedImageUri,
+      videoUri: savedVideoUri,
       id: Math.random().toString(36).substr(2, 9),
       timestamp: Date.now(),
       userId: userProfile?.id || 'guest',
@@ -64,7 +72,7 @@ export default function App() {
     if (userProfile) {
       const updatedUser: UserType = {
         ...userProfile,
-        sharedPhotos: [...(userProfile.sharedPhotos || []), ...(newPostData.imageUri ? [newPostData.imageUri] : [])],
+        sharedPhotos: [...(userProfile.sharedPhotos || []), ...(savedImageUri ? [savedImageUri] : [])],
       };
       await StorageService.saveProfile(updatedUser);
       setUserProfile(updatedUser);
@@ -110,7 +118,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
       <View style={styles.header}>
         <View>
@@ -163,7 +171,7 @@ export default function App() {
             loadData();
           }}
         >
-          <LayoutGrid stroke={currentTab === 'feed' ? '#6200ee' : '#666'} size={24} />
+          <LayoutGrid stroke={currentTab === 'feed' ? '#4F46E5' : '#9CA3AF'} size={24} />
           <Text style={[styles.tabLabel, currentTab === 'feed' && styles.activeTabLabel]}>Feed</Text>
         </TouchableOpacity>
 
@@ -175,7 +183,7 @@ export default function App() {
               loadData();
             }}
           >
-            <Building2 stroke={currentTab === 'agency' ? '#6200ee' : '#666'} size={24} />
+            <Building2 stroke={currentTab === 'agency' ? '#4F46E5' : '#9CA3AF'} size={24} />
             <Text style={[styles.tabLabel, currentTab === 'agency' && styles.activeTabLabel]}>Agency</Text>
           </TouchableOpacity>
         )}
@@ -187,7 +195,7 @@ export default function App() {
             loadData();
           }}
         >
-          <User stroke={currentTab === 'profile' ? '#6200ee' : '#666'} size={24} />
+          <User stroke={currentTab === 'profile' ? '#4F46E5' : '#9CA3AF'} size={24} />
           <Text style={[styles.tabLabel, currentTab === 'profile' && styles.activeTabLabel]}>Profile</Text>
         </TouchableOpacity>
       </View>
@@ -204,24 +212,26 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F9FAFB',
   },
   header: {
     padding: 20,
     paddingTop: 10,
-    backgroundColor: '#000',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
   headerTitle: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 28,
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
   headerSubtitle: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 14,
     marginTop: 4,
   },
@@ -235,11 +245,11 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
-    shadowColor: '#6200ee',
+    shadowColor: '#4F46E5',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 10,
@@ -247,9 +257,9 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     height: 70,
-    backgroundColor: '#111',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#222',
+    borderTopColor: '#E5E7EB',
     paddingBottom: 10,
   },
   tabItem: {
@@ -258,12 +268,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabLabel: {
-    color: '#666',
+    color: '#9CA3AF',
     fontSize: 12,
     marginTop: 4,
   },
   activeTabLabel: {
-    color: '#6200ee',
+    color: '#4F46E5',
     fontWeight: 'bold',
   },
 });

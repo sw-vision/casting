@@ -45,7 +45,7 @@ export const Feed: React.FC<Props> = ({
       }}
       contentContainerStyle={styles.container}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4F46E5" />
       }
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 16,
     textAlign: 'center',
   },

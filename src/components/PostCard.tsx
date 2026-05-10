@@ -15,13 +15,13 @@ export const PostCard = ({ post }: { post: Post }) => {
           {post.userAvatar ? (
             <Image source={{ uri: post.userAvatar }} style={styles.avatar} />
           ) : (
-            <User size={20} stroke="#fff" />
+            <User size={20} stroke="#6B7280" />
           )}
         </View>
         <View>
           <Text style={styles.userName}>{post.userName}</Text>
           <View style={styles.timeContainer}>
-            <Calendar size={12} stroke="#aaa" />
+            <Calendar size={12} stroke="#9CA3AF" />
             <Text style={styles.timestamp}>
               {new Date(post.timestamp).toLocaleDateString()}
             </Text>
@@ -44,17 +44,17 @@ export const PostCard = ({ post }: { post: Post }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     marginVertical: 10,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#333',
-    elevation: 5,
+    borderColor: '#E5E7EB',
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   header: {
     flexDirection: 'row',
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#333',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userName: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -86,20 +86,20 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   timestamp: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 12,
     marginLeft: 4,
   },
   image: {
     width: '100%',
     height: width * 0.8,
-    backgroundColor: '#222',
+    backgroundColor: '#F3F4F6',
   },
   content: {
     padding: 15,
   },
   experience: {
-    color: '#eee',
+    color: '#4B5563',
     fontSize: 14,
     lineHeight: 20,
   },

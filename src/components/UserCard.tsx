@@ -15,7 +15,7 @@ export const UserCard: React.FC<Props> = ({ user, onPress }) => {
         {user.avatar ? (
           <Image source={{ uri: user.avatar }} style={styles.avatar} />
         ) : (
-          <UserIcon size={30} stroke="#666" />
+          <UserIcon size={30} stroke="#9CA3AF" />
         )}
       </View>
       <View style={styles.info}>
@@ -34,19 +34,24 @@ export const UserCard: React.FC<Props> = ({ user, onPress }) => {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: '#111',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   avatarContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -60,18 +65,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
     fontWeight: 'bold',
   },
   role: {
-    color: '#6200ee',
+    color: '#4F46E5',
     fontSize: 12,
     fontWeight: '600',
     marginTop: 2,
   },
   bio: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 12,
     marginTop: 4,
   },

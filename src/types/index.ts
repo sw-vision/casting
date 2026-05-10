@@ -9,6 +9,9 @@ export interface User {
   bio?: string;
   sharedPhotos?: string[];
   subscribedAgencies?: string[]; // IDs of agencies this talent is subscribed to
+  skintone?: string;
+  experience?: string;
+  availability?: string;
   email?: string;
   password?: string;
 }

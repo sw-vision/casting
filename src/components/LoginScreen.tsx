@@ -9,6 +9,7 @@ import {
   Platform,
   Alert,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { Mail, Lock, LogIn, Building2, User } from 'lucide-react-native';
 import { StorageService } from '../services/storage';
@@ -48,10 +49,15 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}
     >
-      <View style={styles.blurContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.blurContainer}>
         <View style={styles.header}>
           <Text style={styles.title}>Casting</Text>
           <Text style={[styles.title, styles.highlight]}>Connection</Text>
@@ -60,11 +66,11 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Mail size={20} color="#666" style={styles.inputIcon} />
+            <Mail size={20} color="#9CA3AF" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Email Address"
-              placeholderTextColor="#666"
+              placeholderTextColor="#9CA3AF"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -73,11 +79,11 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Lock size={20} color="#666" style={styles.inputIcon} />
+            <Lock size={20} color="#9CA3AF" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#666"
+              placeholderTextColor="#9CA3AF"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -102,16 +108,17 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           <View style={styles.hintContainer}>
             <Text style={styles.hintTitle}>Demo Accounts:</Text>
             <View style={styles.hintRow}>
-              <User size={14} color="#aaa" />
+              <User size={14} color="#6B7280" />
               <Text style={styles.hintText}>talent@test.com / password123</Text>
             </View>
             <View style={styles.hintRow}>
-              <Building2 size={14} color="#aaa" />
+              <Building2 size={14} color="#6B7280" />
               <Text style={styles.hintText}>agency@test.com / password123</Text>
             </View>
           </View>
         </View>
-      </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
@@ -119,20 +126,24 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#F9FAFB',
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 40,
   },
   blurContainer: {
     width: width * 0.85,
     padding: 30,
     borderRadius: 30,
-    backgroundColor: 'rgba(20, 20, 20, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    shadowColor: '#6200ee',
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+    shadowColor: '#4F46E5',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 10,
   },
@@ -143,16 +154,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '900',
-    color: '#fff',
+    color: '#111827',
     letterSpacing: 1,
   },
   highlight: {
-    color: '#6200ee',
+    color: '#4F46E5',
     marginTop: -5,
   },
   subtitle: {
     fontSize: 14,
-    color: '#888',
+    color: '#6B7280',
     marginTop: 8,
     fontWeight: '500',
   },
@@ -162,12 +173,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     borderRadius: 15,
     marginBottom: 20,
     paddingHorizontal: 15,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E7EB',
   },
   inputIcon: {
     marginRight: 12,
@@ -175,18 +186,18 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 55,
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
   },
   loginButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
     flexDirection: 'row',
     height: 55,
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#6200ee',
+    shadowColor: '#4F46E5',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 10,
@@ -196,7 +207,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,
@@ -204,13 +215,13 @@ const styles = StyleSheet.create({
   hintContainer: {
     marginTop: 30,
     padding: 15,
-    backgroundColor: '#111',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: '#E5E7EB',
   },
   hintTitle: {
-    color: '#666',
+    color: '#6B7280',
     fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 8,
@@ -222,7 +233,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   hintText: {
-    color: '#aaa',
+    color: '#4B5563',
     fontSize: 12,
     marginLeft: 8,
   },

@@ -24,13 +24,13 @@ export const RequirementCard: React.FC<Props> = ({
             {requirement.agencyAvatar ? (
               <Image source={{ uri: requirement.agencyAvatar }} style={styles.avatar} />
             ) : (
-              <Building2 size={24} stroke="#666" />
+              <Building2 size={24} stroke="#9CA3AF" />
             )}
           </View>
           <View>
             <Text style={styles.agencyName}>{requirement.agencyName}</Text>
             <View style={styles.timeContainer}>
-              <Calendar size={12} stroke="#aaa" />
+              <Calendar size={12} stroke="#9CA3AF" />
               <Text style={styles.timestamp}>
                 {new Date(requirement.timestamp).toLocaleDateString()}
               </Text>
@@ -55,13 +55,13 @@ export const RequirementCard: React.FC<Props> = ({
       <View style={styles.details}>
         {requirement.location && (
           <View style={styles.detailItem}>
-            <MapPin size={14} stroke="#6200ee" />
+            <MapPin size={14} stroke="#4F46E5" />
             <Text style={styles.detailText}>{requirement.location}</Text>
           </View>
         )}
         {requirement.budget && (
           <View style={styles.detailItem}>
-            <DollarSign size={14} stroke="#6200ee" />
+            <DollarSign size={14} stroke="#4F46E5" />
             <Text style={styles.detailText}>{requirement.budget}</Text>
           </View>
         )}
@@ -72,12 +72,17 @@ export const RequirementCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#111',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#222',
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   header: {
     flexDirection: 'row',
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#222',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -104,7 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   agencyName: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -114,7 +119,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   timestamp: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 12,
     marginLeft: 4,
   },
@@ -123,27 +128,27 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#6200ee',
+    borderColor: '#4F46E5',
   },
   subscribedButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
   },
   subscribeText: {
-    color: '#6200ee',
+    color: '#4F46E5',
     fontSize: 12,
     fontWeight: 'bold',
   },
   subscribedText: {
-    color: '#fff',
+    color: '#ffffff',
   },
   title: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   description: {
-    color: '#ccc',
+    color: '#4B5563',
     fontSize: 14,
     lineHeight: 20,
     marginBottom: 12,
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
   detailItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 12,
@@ -163,7 +168,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   detailText: {
-    color: '#aaa',
+    color: '#6B7280',
     fontSize: 12,
     marginLeft: 4,
   },

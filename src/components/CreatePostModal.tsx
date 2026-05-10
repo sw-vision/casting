@@ -98,7 +98,7 @@ export const CreatePostModal = ({ visible, onClose, onPost }: Props) => {
           <View style={styles.header}>
             <Text style={styles.title}>Share Your Experience</Text>
             <TouchableOpacity onPress={onClose}>
-              <X color="#fff" size={24} />
+              <X color="#111827" size={24} />
             </TouchableOpacity>
           </View>
 
@@ -115,7 +115,7 @@ export const CreatePostModal = ({ visible, onClose, onPost }: Props) => {
                 />
               ) : (
                 <View style={styles.placeholder}>
-                  <ImagePlaceholder color="#aaa" size={48} />
+                  <ImagePlaceholder color="#9CA3AF" size={48} />
                   <Text style={styles.placeholderText}>Select a photo or video</Text>
                 </View>
               )}
@@ -124,7 +124,7 @@ export const CreatePostModal = ({ visible, onClose, onPost }: Props) => {
             <TextInput
               style={styles.input}
               placeholder="Tell your story..."
-              placeholderTextColor="#666"
+              placeholderTextColor="#9CA3AF"
               multiline
               value={experience}
               onChangeText={(text: string) => dispatch({ type: 'SET_EXPERIENCE', payload: text })}
@@ -148,15 +148,20 @@ export const CreatePostModal = ({ visible, onClose, onPost }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#121212',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     height: '90%',
     padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 20,
   },
   header: {
     flexDirection: 'row',
@@ -165,7 +170,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    color: '#fff',
+    color: '#111827',
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -175,14 +180,14 @@ const styles = StyleSheet.create({
   imagePicker: {
     width: '100%',
     height: 250,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F9FAFB',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E7EB',
     borderStyle: 'dashed',
   },
   previewImage: {
@@ -192,29 +197,29 @@ const styles = StyleSheet.create({
   previewVideo: {
     width: '100%',
     height: 250,
-    backgroundColor: '#222',
+    backgroundColor: '#E5E7EB',
   },
   placeholder: {
     alignItems: 'center',
   },
   placeholderText: {
-    color: '#aaa',
+    color: '#6B7280',
     marginTop: 10,
     fontSize: 16,
   },
   input: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#F3F4F6',
     borderRadius: 15,
     padding: 15,
-    color: '#fff',
+    color: '#111827',
     fontSize: 16,
     height: 150,
     textAlignVertical: 'top',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#E5E7EB',
   },
   submitButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#4F46E5',
     flexDirection: 'row',
     height: 56,
     borderRadius: 28,
@@ -223,10 +228,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   disabledButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#E5E7EB',
   },
   submitText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,

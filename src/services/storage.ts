@@ -1,6 +1,6 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { Paths } from 'expo-file-system';
-import { Database, Post, User } from '../types';
+import { Database, Post, User, Requirement } from '../types';
 
 const DB_PATH = Paths.document.uri + '/db.json';
 
@@ -119,7 +119,10 @@ export const StorageService = {
       if (db.talents) {
         const talentIndex = db.talents.findIndex((u: User) => u.email?.toLowerCase() === 'talent@test.com' || u.id === 't1');
         if (talentIndex >= 0) {
-          db.talents[talentIndex] = { ...db.talents[talentIndex], ...DEFAULT_DB.talents[0] };
+          if (!db.talents[talentIndex].email) {
+            db.talents[talentIndex].email = DEFAULT_DB.talents[0].email;
+            db.talents[talentIndex].password = DEFAULT_DB.talents[0].password;
+          }
         } else {
           db.talents.push(DEFAULT_DB.talents[0]);
         }
@@ -128,7 +131,10 @@ export const StorageService = {
       if (db.agencies) {
         const agencyIndex = db.agencies.findIndex((u: User) => u.email?.toLowerCase() === 'agency@test.com' || u.id === 'a2');
         if (agencyIndex >= 0) {
-          db.agencies[agencyIndex] = { ...db.agencies[agencyIndex], ...DEFAULT_DB.agencies[1] };
+          if (!db.agencies[agencyIndex].email) {
+            db.agencies[agencyIndex].email = DEFAULT_DB.agencies[1].email;
+            db.agencies[agencyIndex].password = DEFAULT_DB.agencies[1].password;
+          }
         } else {
           db.agencies.push(DEFAULT_DB.agencies[1]);
         }
@@ -204,6 +210,14 @@ export const StorageService = {
       } else {
         db.agencies.push(user);
       }
+    } else if (user.role === 'talent') {
+      if (!db.talents) db.talents = [];
+      const index = db.talents.findIndex(t => t.id === user.id);
+      if (index >= 0) {
+        db.talents[index] = user;
+      } else {
+        db.talents.push(user);
+      }
     }
     
     await this.save(db);
@@ -247,5 +261,16 @@ export const StorageService = {
     const db = await this.init();
     db.userProfile = undefined;
     await this.save(db);
+  },
+
+  async saveMedia(uri: string): Promise<string> {
+    if (!uri.startsWith('file://')) return uri; // Already a remote URL
+    const filename = uri.split('/').pop();
+    const newPath = `${Paths.document.uri}/${Date.now()}_${filename}`;
+    await FileSystem.copyAsync({
+      from: uri,
+      to: newPath
+    });
+    return newPath;
   }
 };
