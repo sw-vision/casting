@@ -38,7 +38,7 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
       if (user) {
         onLoginSuccess(user);
       } else {
-        Alert.alert('Login Failed', 'Invalid email or password. \n\nTry: talent@test.com or agency@test.com');
+        Alert.alert('Login Failed', 'Invalid credentials. \n\nTry: apex (Agency) or leo (Talent)');
       }
     } catch (error) {
       Alert.alert('Error', 'An unexpected error occurred');
@@ -106,14 +106,14 @@ export const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           </TouchableOpacity>
 
           <View style={styles.hintContainer}>
-            <Text style={styles.hintTitle}>Demo Accounts:</Text>
-            <View style={styles.hintRow}>
-              <User size={14} color="#6B7280" />
-              <Text style={styles.hintText}>talent@test.com / password123</Text>
-            </View>
+            <Text style={styles.hintTitle}>Demo Accounts (User/Pass):</Text>
             <View style={styles.hintRow}>
               <Building2 size={14} color="#6B7280" />
-              <Text style={styles.hintText}>agency@test.com / password123</Text>
+              <Text style={styles.hintText}>Agency: apex / apex</Text>
+            </View>
+            <View style={styles.hintRow}>
+              <User size={14} color="#6B7280" />
+              <Text style={styles.hintText}>Talent: leo / leo</Text>
             </View>
           </View>
         </View>

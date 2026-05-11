@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { MapPin, DollarSign, Calendar, Building2, User } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Share } from 'react-native';
+import { MapPin, DollarSign, Calendar, Building2, User, Clock, Users, Ruler, Scale, Palette, Briefcase, Share2 } from 'lucide-react-native';
 import { Requirement } from '../types';
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
   isSubscribed: boolean;
   onSubscribe: (agencyId: string) => void;
   onUnsubscribe: (agencyId: string) => void;
+  showShare?: boolean;
 }
 
 export const RequirementCard: React.FC<Props> = ({
@@ -15,7 +16,43 @@ export const RequirementCard: React.FC<Props> = ({
   isSubscribed,
   onSubscribe,
   onUnsubscribe,
+  showShare = false,
 }) => {
+  const handleShare = async () => {
+    try {
+      const genderText = requirement.gender ? requirement.gender.charAt(0).toUpperCase() + requirement.gender.slice(1) : 'Any';
+      const shareText = `
+🌟 *CASTING CALL: ${requirement.title}* 🌟
+
+🏢 *Agency:* ${requirement.agencyName}
+📍 *Location:* ${requirement.location || 'Multiple Locations'}
+💰 *Budget:* ${requirement.budget || 'Competitive'}
+
+👥 *Requirements:*
+• Gender: ${genderText}
+• Age: ${requirement.age || 'Any'}
+• Height: ${requirement.height || 'Not specified'}
+• Skin Tone: ${requirement.skintone || 'Any'}
+• Experience: ${requirement.experience || 'Fresher/Experienced'}
+
+📝 *Description:*
+${requirement.description}
+
+📞 *How to Apply:*
+Contact *${requirement.agencyName}* via the Casting Connection app or their official portal.
+
+#CastingCall #Audition #ActingJobs #CastingConnection
+      `.trim();
+
+      await Share.share({
+        message: shareText,
+        title: requirement.title,
+      });
+    } catch (error) {
+      console.error('Error sharing requirement:', error);
+    }
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -59,13 +96,68 @@ export const RequirementCard: React.FC<Props> = ({
             <Text style={styles.detailText}>{requirement.location}</Text>
           </View>
         )}
-        {requirement.budget && (
+        {requirement.gender && (
+          <View style={styles.detailItem}>
+            <User size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Gender: {requirement.gender.charAt(0).toUpperCase() + requirement.gender.slice(1)}</Text>
+          </View>
+        )}
+        {requirement.age && (
+          <View style={styles.detailItem}>
+            <Users size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Age: {requirement.age}</Text>
+          </View>
+        )}
+        {requirement.duration && (
+          <View style={styles.detailItem}>
+            <Clock size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Duration: {requirement.duration}</Text>
+          </View>
+        )}
+        {requirement.wagesPerDay && (
           <View style={styles.detailItem}>
             <DollarSign size={14} stroke="#4F46E5" />
-            <Text style={styles.detailText}>{requirement.budget}</Text>
+            <Text style={styles.detailText}>Wages: {requirement.wagesPerDay} / day</Text>
+          </View>
+        )}
+        {requirement.height && (
+          <View style={styles.detailItem}>
+            <Ruler size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Height: {requirement.height}</Text>
+          </View>
+        )}
+        {requirement.weight && (
+          <View style={styles.detailItem}>
+            <Scale size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Weight: {requirement.weight}</Text>
+          </View>
+        )}
+        {requirement.skintone && (
+          <View style={styles.detailItem}>
+            <Palette size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Skin: {requirement.skintone}</Text>
+          </View>
+        )}
+        {requirement.experience && (
+          <View style={styles.detailItem}>
+            <Briefcase size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Exp: {requirement.experience}</Text>
+          </View>
+        )}
+        {requirement.availability && (
+          <View style={styles.detailItem}>
+            <Calendar size={14} stroke="#4F46E5" />
+            <Text style={styles.detailText}>Avail: {requirement.availability}</Text>
           </View>
         )}
       </View>
+      
+      {showShare && (
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+          <Share2 size={16} stroke="#4F46E5" />
+          <Text style={styles.shareText}>Share Casting Call</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -171,5 +263,20 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 12,
     marginLeft: 4,
+  },
+  shareButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 15,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  shareText: {
+    color: '#4F46E5',
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });

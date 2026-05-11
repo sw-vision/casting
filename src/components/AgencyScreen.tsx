@@ -14,17 +14,22 @@ import { StorageService } from '../services/storage';
 import { Requirement, User, User as UserType } from '../types';
 import { RequirementCard } from './RequirementCard';
 import { CreateRequirementModal } from './CreateRequirementModal';
+import { ProfileModal } from './ProfileModal';
 
 import { UserCard } from './UserCard';
 
-export const AgencyScreen = () => {
+interface AgencyScreenProps {
+  onRequirementPosted?: (req: Omit<Requirement, 'id' | 'timestamp' | 'agencyId' | 'agencyName' | 'agencyAvatar'>) => void;
+}
+
+export const AgencyScreen: React.FC<AgencyScreenProps> = ({ onRequirementPosted }) => {
   const [requirements, setRequirements] = useState<Requirement[]>([]);
   const [agencies, setAgencies] = useState<User[]>([]);
   const [talents, setTalents] = useState<User[]>([]);
   const [user, setUser] = useState<UserType | undefined>();
   const [refreshing, setRefreshing] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const flatListRef = useRef<FlatList>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [searchQuery, setSearchQuery] = useState({
     height: '',
@@ -35,6 +40,26 @@ export const AgencyScreen = () => {
   });
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchResults, setSearchResults] = useState<User[] | null>(null);
+
+  const [isPostReqExpanded, setIsPostReqExpanded] = useState(false);
+  const [postReqForm, setPostReqForm] = useState({
+    title: '',
+    description: '',
+    location: '',
+    budget: '',
+    gender: 'any' as 'male' | 'female' | 'child' | 'any',
+    age: '',
+    duration: '',
+    wagesPerDay: '',
+    height: '',
+    weight: '',
+    skintone: '',
+    experience: '',
+    availability: '',
+  });
+
+  const [selectedUser, setSelectedUser] = useState<UserType | undefined>();
+  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -55,18 +80,22 @@ export const AgencyScreen = () => {
     setRefreshing(false);
   };
 
-  const handlePostRequirement = async (reqData: Omit<Requirement, 'id' | 'timestamp' | 'agencyId' | 'agencyName' | 'agencyAvatar'>) => {
-    if (!user) return;
-    const newReq: Requirement = {
-      ...reqData,
-      id: Math.random().toString(36).substr(2, 9),
-      timestamp: Date.now(),
-      agencyId: user.id,
-      agencyName: user.name || 'Agency',
-      agencyAvatar: user.avatar,
-    };
-
-    await StorageService.addRequirement(newReq);
+  const handleInternalPostRequirement = async (reqData: Omit<Requirement, 'id' | 'timestamp' | 'agencyId' | 'agencyName' | 'agencyAvatar'>) => {
+    if (onRequirementPosted) {
+      onRequirementPosted(reqData);
+    } else {
+      // Fallback if not passed
+      if (!user) return;
+      const newReq: Requirement = {
+        ...reqData,
+        id: Math.random().toString(36).substr(2, 9),
+        timestamp: Date.now(),
+        agencyId: user.id,
+        agencyName: user.name || 'Agency',
+        agencyAvatar: user.avatar,
+      };
+      await StorageService.addRequirement(newReq);
+    }
     loadData();
   };
 
@@ -118,12 +147,13 @@ export const AgencyScreen = () => {
             const handlePress = () => {
               if (item.id === '1') {
                 if (displayData.length > 0) {
-                  flatListRef.current?.scrollToIndex({ index: 0, animated: true, viewOffset: 20 });
+                  // Approximate scroll
+                  scrollViewRef.current?.scrollTo({ y: 300, animated: true });
                 } else {
-                  flatListRef.current?.scrollToOffset({ offset: 300, animated: true });
+                  scrollViewRef.current?.scrollTo({ y: 500, animated: true });
                 }
               } else if (item.id === '2') {
-                flatListRef.current?.scrollToEnd({ animated: true });
+                scrollViewRef.current?.scrollToEnd({ animated: true });
               }
             };
 
@@ -160,6 +190,89 @@ export const AgencyScreen = () => {
       return match;
     });
     setSearchResults(results);
+  };
+
+  const renderPostRequirement = () => {
+    if (user?.role !== 'agency') return null;
+
+    return (
+      <View style={styles.searchContainer}>
+        <TouchableOpacity 
+          style={styles.searchHeader} 
+          onPress={() => setIsPostReqExpanded(!isPostReqExpanded)}
+        >
+          <View style={styles.searchTitleRow}>
+            <ClipboardList size={20} stroke="#4F46E5" />
+            <Text style={styles.searchTitleText}>Post Requirement</Text>
+          </View>
+          {isPostReqExpanded ? <ChevronUp size={20} stroke="#6B7280" /> : <ChevronDown size={20} stroke="#6B7280" />}
+        </TouchableOpacity>
+
+        {isPostReqExpanded && (
+          <View style={styles.searchBody}>
+            <TextInput style={styles.searchInput} placeholder="Title (e.g. Lead Actor)" value={postReqForm.title} onChangeText={t => setPostReqForm({...postReqForm, title: t})} placeholderTextColor="#9CA3AF" />
+            <TextInput style={[styles.searchInput, {height: 80, textAlignVertical: 'top'}]} placeholder="Description" value={postReqForm.description} onChangeText={t => setPostReqForm({...postReqForm, description: t})} placeholderTextColor="#9CA3AF" multiline />
+            
+            <View style={styles.searchRow}>
+              <TextInput style={[styles.searchInput, styles.halfInput]} placeholder="Location" value={postReqForm.location} onChangeText={t => setPostReqForm({...postReqForm, location: t})} placeholderTextColor="#9CA3AF" />
+              <TextInput style={[styles.searchInput, styles.halfInput]} placeholder="Age Range" value={postReqForm.age} onChangeText={t => setPostReqForm({...postReqForm, age: t})} placeholderTextColor="#9CA3AF" />
+            </View>
+
+            <View style={styles.genderContainer}>
+              {(['any', 'male', 'female', 'child'] as const).map((g) => (
+                <TouchableOpacity
+                  key={g}
+                  style={[styles.genderButton, postReqForm.gender === g && styles.genderButtonActive]}
+                  onPress={() => setPostReqForm({...postReqForm, gender: g})}
+                >
+                  <Text style={[styles.genderText, postReqForm.gender === g && styles.genderTextActive]}>
+                    {g.charAt(0).toUpperCase() + g.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.searchRow}>
+              <TextInput style={[styles.searchInput, styles.halfInput]} placeholder="Duration" value={postReqForm.duration} onChangeText={t => setPostReqForm({...postReqForm, duration: t})} placeholderTextColor="#9CA3AF" />
+              <TextInput style={[styles.searchInput, styles.halfInput]} placeholder="Wages / Day" value={postReqForm.wagesPerDay} onChangeText={t => setPostReqForm({...postReqForm, wagesPerDay: t})} placeholderTextColor="#9CA3AF" />
+            </View>
+
+            <View style={styles.searchRow}>
+              <TextInput style={[styles.searchInput, styles.halfInput]} placeholder="Height (cm)" value={postReqForm.height} onChangeText={t => setPostReqForm({...postReqForm, height: t})} placeholderTextColor="#9CA3AF" />
+              <TextInput style={[styles.searchInput, styles.halfInput]} placeholder="Weight (kg)" value={postReqForm.weight} onChangeText={t => setPostReqForm({...postReqForm, weight: t})} placeholderTextColor="#9CA3AF" />
+            </View>
+
+            <TextInput style={styles.searchInput} placeholder="Skin Tone (e.g. Fair)" value={postReqForm.skintone} onChangeText={t => setPostReqForm({...postReqForm, skintone: t})} placeholderTextColor="#9CA3AF" />
+            <TextInput style={styles.searchInput} placeholder="Experience keyword" value={postReqForm.experience} onChangeText={t => setPostReqForm({...postReqForm, experience: t})} placeholderTextColor="#9CA3AF" />
+            <TextInput style={styles.searchInput} placeholder="Availability (e.g. Weekends)" value={postReqForm.availability} onChangeText={t => setPostReqForm({...postReqForm, availability: t})} placeholderTextColor="#9CA3AF" />
+
+            <TextInput style={styles.searchInput} placeholder="Total Budget" value={postReqForm.budget} onChangeText={t => setPostReqForm({...postReqForm, budget: t})} placeholderTextColor="#9CA3AF" />
+            
+            <View style={styles.searchActions}>
+              <TouchableOpacity 
+                style={styles.clearButton} 
+                onPress={() => setPostReqForm({title: '', description: '', location: '', budget: '', gender: 'any', age: '', duration: '', wagesPerDay: '', height: '', weight: '', skintone: '', experience: '', availability: ''})}
+              >
+                <Text style={styles.clearButtonText}>Clear</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.searchButton, (!postReqForm.title || !postReqForm.description) && {opacity: 0.5}]} 
+                onPress={() => {
+                  if (postReqForm.title && postReqForm.description) {
+                    handleInternalPostRequirement(postReqForm);
+                    setPostReqForm({title: '', description: '', location: '', budget: '', gender: 'any', age: '', duration: '', wagesPerDay: '', height: '', weight: '', skintone: '', experience: '', availability: ''});
+                    setIsPostReqExpanded(false);
+                  }
+                }}
+                disabled={!postReqForm.title || !postReqForm.description}
+              >
+                <Text style={styles.searchButtonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </View>
+    );
   };
 
   const renderTalentSearch = () => {
@@ -208,7 +321,16 @@ export const AgencyScreen = () => {
             {searchResults.length === 0 ? (
               <Text style={styles.noResultsText}>No talents match your criteria.</Text>
             ) : (
-              searchResults.map(t => <UserCard key={t.id} user={t} />)
+              searchResults.map(t => (
+                <UserCard 
+                  key={t.id} 
+                  user={t} 
+                  onPress={() => {
+                    setSelectedUser(t);
+                    setIsProfileModalVisible(true);
+                  }}
+                />
+              ))
             )}
           </View>
         )}
@@ -219,6 +341,7 @@ export const AgencyScreen = () => {
   const renderHeader = () => (
     <View style={styles.header}>
       {renderAgencyDashboard()}
+      {renderPostRequirement()}
       {renderTalentSearch()}
       {user?.role === 'talent' ? (
         <>
@@ -264,46 +387,58 @@ export const AgencyScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        data={displayData}
-        renderItem={({ item }) => {
-          if ('title' in item) {
-            return (
-              <RequirementCard
-                requirement={item}
-                isSubscribed={true}
-                onSubscribe={() => {}}
-                onUnsubscribe={() => {}}
-              />
-            );
-          }
-          return <UserCard user={item} />;
-        }}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={() => (
-          user?.role === 'agency' ? (
-            <View style={styles.footer}>
-              <Text style={styles.sectionTitle}>My Subscribers</Text>
-              {talents.filter(t => t.subscribedAgencies?.includes(user.id)).map(talent => (
-                <UserCard key={talent.id} user={talent} />
-              ))}
-            </View>
-          ) : null
-        )}
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={loadData} tintColor="#4F46E5" />
         }
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>
-              {user?.role === 'agency' ? 'No requirements posted yet.' : 'No subscriptions yet.'}
-            </Text>
+      >
+        {renderHeader()}
+        
+        <View style={styles.listContainer}>
+          {displayData.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>
+                {user?.role === 'agency' ? 'No requirements posted yet.' : 'No subscriptions yet.'}
+              </Text>
+            </View>
+          ) : (
+            displayData.map((item) => {
+              if ('title' in item) {
+                return (
+                  <RequirementCard
+                    key={item.id}
+                    requirement={item}
+                    isSubscribed={true}
+                    onSubscribe={() => {}}
+                    onUnsubscribe={() => {}}
+                    showShare={user?.role === 'agency'}
+                  />
+                );
+              }
+              return <UserCard key={item.id} user={item} />;
+            })
+          )}
+        </View>
+
+        {user?.role === 'agency' && (
+          <View style={styles.footer}>
+            <Text style={styles.sectionTitle}>My Subscribers</Text>
+            {talents.filter(t => t.subscribedAgencies?.includes(user.id)).map(talent => (
+              <UserCard 
+                key={talent.id} 
+                user={talent} 
+                onPress={() => {
+                  setSelectedUser(talent);
+                  setIsProfileModalVisible(true);
+                }}
+              />
+            ))}
           </View>
-        }
-      />
+        )}
+      </ScrollView>
 
       {user?.role === 'agency' && (
         <TouchableOpacity
@@ -317,7 +452,14 @@ export const AgencyScreen = () => {
       <CreateRequirementModal
         visible={isModalVisible}
         onClose={() => setModalVisible(false)}
-        onPost={handlePostRequirement}
+        onPost={handleInternalPostRequirement}
+      />
+
+      <ProfileModal
+        visible={isProfileModalVisible}
+        user={selectedUser}
+        agencies={agencies}
+        onClose={() => setIsProfileModalVisible(false)}
       />
     </View>
   );
@@ -327,6 +469,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  listContainer: {
+    marginBottom: 20,
   },
   listContent: {
     padding: 20,
@@ -574,5 +722,33 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     paddingVertical: 10,
+  },
+  genderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  genderButton: {
+    flex: 1,
+    paddingVertical: 10,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  genderButtonActive: {
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4F46E5',
+  },
+  genderText: {
+    color: '#6B7280',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  genderTextActive: {
+    color: '#4F46E5',
+    fontWeight: 'bold',
   },
 });

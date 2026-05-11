@@ -22,10 +22,15 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.antigravity"
+      "package": "com.brandingguruji.casting"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "770c2816-cdae-4954-9742-2dbb40f7bbc7"
+      }
     }
   }
 }

@@ -24,6 +24,15 @@ export const CreateRequirementModal: React.FC<Props> = ({ visible, onClose, onPo
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [budget, setBudget] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | 'child' | 'any'>('any');
+  const [age, setAge] = useState('');
+  const [duration, setDuration] = useState('');
+  const [wagesPerDay, setWagesPerDay] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [skintone, setSkintone] = useState('');
+  const [experience, setExperience] = useState('');
+  const [availability, setAvailability] = useState('');
 
   const handlePost = () => {
     if (!title || !description) return;
@@ -32,11 +41,29 @@ export const CreateRequirementModal: React.FC<Props> = ({ visible, onClose, onPo
       description,
       location,
       budget,
+      gender,
+      age,
+      duration,
+      wagesPerDay,
+      height,
+      weight,
+      skintone,
+      experience,
+      availability,
     });
     setTitle('');
     setDescription('');
     setLocation('');
     setBudget('');
+    setGender('any');
+    setAge('');
+    setDuration('');
+    setWagesPerDay('');
+    setHeight('');
+    setWeight('');
+    setSkintone('');
+    setExperience('');
+    setAvailability('');
     onClose();
   };
 
@@ -86,12 +113,109 @@ export const CreateRequirementModal: React.FC<Props> = ({ visible, onClose, onPo
               placeholderTextColor="#9CA3AF"
             />
 
-            <Text style={styles.label}>Budget / Remuneration</Text>
+            <Text style={styles.label}>Gender</Text>
+            <View style={styles.genderContainer}>
+              {(['any', 'male', 'female', 'child'] as const).map((g) => (
+                <TouchableOpacity
+                  key={g}
+                  style={[styles.genderButton, gender === g && styles.genderButtonActive]}
+                  onPress={() => setGender(g)}
+                >
+                  <Text style={[styles.genderText, gender === g && styles.genderTextActive]}>
+                    {g.charAt(0).toUpperCase() + g.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.row}>
+              <View style={{ flex: 1, marginRight: 10 }}>
+                <Text style={styles.label}>Age Range</Text>
+                <TextInput
+                  style={styles.input}
+                  value={age}
+                  onChangeText={setAge}
+                  placeholder="e.g. 20-25"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Duration</Text>
+                <TextInput
+                  style={styles.input}
+                  value={duration}
+                  onChangeText={setDuration}
+                  placeholder="e.g. 3 Days"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            <Text style={styles.label}>Wages Per Day</Text>
+            <TextInput
+              style={styles.input}
+              value={wagesPerDay}
+              onChangeText={setWagesPerDay}
+              placeholder="e.g. ₹5,000"
+              placeholderTextColor="#9CA3AF"
+            />
+
+            <View style={styles.row}>
+              <View style={{ flex: 1, marginRight: 10 }}>
+                <Text style={styles.label}>Height (cm)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={height}
+                  onChangeText={setHeight}
+                  placeholder="e.g. 170"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Weight (kg)</Text>
+                <TextInput
+                  style={styles.input}
+                  value={weight}
+                  onChangeText={setWeight}
+                  placeholder="e.g. 65"
+                  placeholderTextColor="#9CA3AF"
+                />
+              </View>
+            </View>
+
+            <Text style={styles.label}>Skin Tone</Text>
+            <TextInput
+              style={styles.input}
+              value={skintone}
+              onChangeText={setSkintone}
+              placeholder="e.g. Fair, Dusky"
+              placeholderTextColor="#9CA3AF"
+            />
+
+            <Text style={styles.label}>Experience Keyword</Text>
+            <TextInput
+              style={styles.input}
+              value={experience}
+              onChangeText={setExperience}
+              placeholder="e.g. Theater, Commercials"
+              placeholderTextColor="#9CA3AF"
+            />
+
+            <Text style={styles.label}>Availability</Text>
+            <TextInput
+              style={styles.input}
+              value={availability}
+              onChangeText={setAvailability}
+              placeholder="e.g. Immediate, Weekends"
+              placeholderTextColor="#9CA3AF"
+            />
+
+            <Text style={styles.label}>Budget / Remuneration (Total)</Text>
             <TextInput
               style={styles.input}
               value={budget}
               onChangeText={setBudget}
-              placeholder="e.g. ₹5,000 / day"
+              placeholder="e.g. ₹50,000"
               placeholderTextColor="#9CA3AF"
             />
           </ScrollView>
@@ -150,7 +274,39 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   textArea: {
-    height: 150,
+    height: 120,
     textAlignVertical: 'top',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  genderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  genderButton: {
+    flex: 1,
+    paddingVertical: 10,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  genderButtonActive: {
+    backgroundColor: '#EEF2FF',
+    borderColor: '#4F46E5',
+  },
+  genderText: {
+    color: '#6B7280',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  genderTextActive: {
+    color: '#4F46E5',
+    fontWeight: 'bold',
   },
 });

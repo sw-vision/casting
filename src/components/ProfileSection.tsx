@@ -14,15 +14,18 @@ const User = UserIcon as any;
 const Camera = CameraIcon as any;
 const Save = SaveIcon as any;
 import { UserCard } from './UserCard';
-import { User as UserType } from '../types';
+import { RequirementCard } from './RequirementCard';
+import { User as UserType, Requirement } from '../types';
 import { StorageService } from '../services/storage';
+import { Briefcase } from 'lucide-react-native';
 interface Props {
   user: UserType | undefined;
   agencies: UserType[];
-  onSave: (user: UserType) => void;
+  onSave?: (user: UserType) => void;
+  readOnly?: boolean;
 }
 
-export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
+export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave, readOnly }) => {
   const [name, setName] = useState(user?.name || '');
   const [avatar, setAvatar] = useState(user?.avatar || '');
   const [dob, setDob] = useState(user?.dob || '');
@@ -33,6 +36,7 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
   const [availability, setAvailability] = useState(user?.availability || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [role, setRole] = useState<'talent' | 'agency'>(user?.role || 'talent');
+  const [proposals, setProposals] = useState<Requirement[]>([]);
 
   React.useEffect(() => {
     if (user) {
@@ -81,41 +85,161 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
     });
   };
 
+  const calculateAge = (dobString: string) => {
+    if (!dobString || dobString.length !== 10) return null;
+    const parts = dobString.split('/');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+
+    const today = new Date();
+    const birthDate = new Date(year, month - 1, day);
+    if (birthDate.getTime() > today.getTime()) return null;
+    
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : null;
+  };
+
+  const calculateMatchScore = (u: UserType, req: Requirement) => {
+    let score = 0;
+    const userAge = calculateAge(u.dob || '');
+    
+    // Gender (30%)
+    if (req.gender === 'any' || req.gender === u.gender) score += 30;
+    
+    // Age (20%)
+    if (req.age && userAge !== null) {
+      const parts = req.age.split('-').map(p => parseInt(p.trim()));
+      if (parts.length === 2) {
+        if (userAge >= parts[0] && userAge <= parts[1]) score += 20;
+      } else if (!isNaN(parts[0])) {
+        if (Math.abs(userAge - parts[0]) <= 5) score += 20;
+      } else {
+        score += 20;
+      }
+    } else {
+      score += 20;
+    }
+
+    // Height (15%)
+    if (req.height && u.height) {
+      const reqH = parseInt(req.height);
+      const userH = parseInt(u.height);
+      if (!isNaN(reqH) && !isNaN(userH)) {
+        if (Math.abs(reqH - userH) <= 10) score += 15;
+      } else {
+        score += 15;
+      }
+    } else {
+      score += 15;
+    }
+
+    // Skin Tone (10%)
+    if (req.skintone && u.skintone) {
+      if (req.skintone.toLowerCase().includes(u.skintone.toLowerCase()) || 
+          u.skintone.toLowerCase().includes(req.skintone.toLowerCase())) {
+        score += 10;
+      }
+    } else {
+      score += 10;
+    }
+
+    // Experience (15%)
+    if (req.experience && u.experience) {
+      const reqExp = req.experience.toLowerCase();
+      const userExp = u.experience.toLowerCase();
+      if (userExp.includes(reqExp) || reqExp.includes(userExp)) score += 15;
+      else score += 5;
+    } else {
+      score += 15;
+    }
+
+    // Availability (10%)
+    if (req.availability && u.availability) {
+      if (u.availability.toLowerCase().includes(req.availability.toLowerCase())) score += 10;
+    } else {
+      score += 10;
+    }
+
+    return score;
+  };
+
+  const loadProposals = async () => {
+    if (!user || user.role !== 'talent') return;
+    const allReqs = await StorageService.getRequirements();
+    const matches = allReqs.filter(req => {
+      // Must be subscribed to the agency to see their proposals
+      if (!user.subscribedAgencies?.includes(req.agencyId)) return false;
+      
+      const score = calculateMatchScore(user, req);
+      return score >= 70;
+    });
+    setProposals(matches);
+  };
+
+  React.useEffect(() => {
+    if (!readOnly && user?.role === 'talent') {
+      loadProposals();
+    }
+  }, [user, readOnly]);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+        <TouchableOpacity 
+          style={styles.avatarContainer} 
+          onPress={readOnly ? undefined : pickImage}
+          activeOpacity={readOnly ? 1 : 0.7}
+        >
           {avatar ? (
             <Image source={{ uri: avatar }} style={styles.avatar} />
           ) : (
             <User size={60} stroke="#666" />
           )}
-          <View style={styles.cameraIcon}>
-            <Camera size={20} stroke="#fff" />
-          </View>
+          {!readOnly && (
+            <View style={styles.cameraIcon}>
+              <Camera size={20} stroke="#fff" />
+            </View>
+          )}
         </TouchableOpacity>
-        <Text style={styles.title}>{name || 'My Profile'}</Text>
+        <Text style={styles.title}>{name || (readOnly ? 'User Profile' : 'My Profile')}</Text>
       </View>
 
       <View style={styles.form}>
         <Text style={styles.label}>Full Name</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, readOnly && styles.readOnlyInput]}
           value={name}
           onChangeText={setName}
-          placeholder="Enter your name"
+          placeholder="Enter name"
           placeholderTextColor="#9CA3AF"
+          editable={!readOnly}
         />
         <View style={styles.row}>
           <View style={[styles.inputGroup, { marginRight: 10 }]}>
             <Text style={styles.label}>Date of Birth</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, readOnly && styles.readOnlyInput]}
               value={dob}
               onChangeText={setDob}
               placeholder="DD/MM/YYYY"
               placeholderTextColor="#9CA3AF"
+              editable={!readOnly}
             />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Age</Text>
+            <View style={[styles.input, styles.readOnlyInput, { justifyContent: 'center' }]}>
+              <Text style={{ fontSize: 18, color: '#111827', fontWeight: '500' }}>
+                {calculateAge(dob) !== null ? `${calculateAge(dob)} years` : '--'}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -123,23 +247,25 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
           <View style={[styles.inputGroup, { marginRight: 10 }]}>
             <Text style={styles.label}>Height (cm)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, readOnly && styles.readOnlyInput]}
               value={height}
               onChangeText={setHeight}
               placeholder="e.g. 180"
               placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
+              editable={!readOnly}
             />
           </View>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Weight (kg)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, readOnly && styles.readOnlyInput]}
               value={weight}
               onChangeText={setWeight}
               placeholder="e.g. 75"
               placeholderTextColor="#9CA3AF"
               keyboardType="numeric"
+              editable={!readOnly}
             />
           </View>
         </View>
@@ -148,48 +274,54 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
           <View style={[styles.inputGroup, { marginRight: 10 }]}>
             <Text style={styles.label}>Skin Tone</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, readOnly && styles.readOnlyInput]}
               value={skintone}
               onChangeText={setSkintone}
               placeholder="e.g. Fair, Medium, Dark"
               placeholderTextColor="#9CA3AF"
+              editable={!readOnly}
             />
           </View>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Availability</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, readOnly && styles.readOnlyInput]}
               value={availability}
               onChangeText={setAvailability}
               placeholder="e.g. Full-time, Weekends"
               placeholderTextColor="#9CA3AF"
+              editable={!readOnly}
             />
           </View>
         </View>
 
         <Text style={styles.label}>Work Experience</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, readOnly && styles.readOnlyInput]}
           value={experience}
           onChangeText={setExperience}
           placeholder="e.g. 5 years theater, 2 commercials"
           placeholderTextColor="#9CA3AF"
+          editable={!readOnly}
         />
 
         <Text style={styles.label}>Bio / Experience Summary</Text>
         <TextInput
-          style={[styles.input, styles.bioInput]}
+          style={[styles.input, styles.bioInput, readOnly && styles.readOnlyInput]}
           value={bio}
           onChangeText={setBio}
-          placeholder="Tell agencies about your acting journey..."
+          placeholder="Experience summary..."
           placeholderTextColor="#9CA3AF"
           multiline
+          editable={!readOnly}
         />
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Save size={20} stroke="#fff" />
-          <Text style={styles.saveButtonText}>Save Profile</Text>
-        </TouchableOpacity>
+        {!readOnly && (
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Save size={20} stroke="#fff" />
+            <Text style={styles.saveButtonText}>Save Profile</Text>
+          </TouchableOpacity>
+        )}
 
         {user?.sharedPhotos && user.sharedPhotos.length > 0 && (
           <View style={styles.gallerySection}>
@@ -199,6 +331,34 @@ export const ProfileSection: React.FC<Props> = ({ user, agencies, onSave }) => {
                 <Image key={index} source={{ uri }} style={styles.galleryImage} />
               ))}
             </View>
+          </View>
+        )}
+
+        {!readOnly && user?.role === 'talent' && (
+          <View style={styles.proposalsSection}>
+            <View style={styles.sectionHeader}>
+              <Briefcase size={20} stroke="#4F46E5" />
+              <Text style={styles.sectionTitle}>Casting Proposals</Text>
+            </View>
+            <Text style={styles.proposalInfo}>
+              Based on your profile compatibility (70%+ match) with subscribed agencies.
+            </Text>
+            {proposals.length > 0 ? (
+              proposals.map(req => (
+                <RequirementCard 
+                  key={req.id} 
+                  requirement={req} 
+                  isSubscribed={true}
+                  onSubscribe={() => {}}
+                  onUnsubscribe={() => {}}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyProposals}>
+                <Text style={styles.emptyText}>No matching casting proposals found yet.</Text>
+                <Text style={styles.emptySubText}>Keep your profile updated to get more matches!</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -352,5 +512,51 @@ const styles = StyleSheet.create({
   subscriptionSection: {
     marginTop: 20,
     marginBottom: 40,
+  },
+  readOnlyInput: {
+    backgroundColor: '#FFFFFF',
+    borderColor: 'transparent',
+    paddingHorizontal: 0,
+    fontSize: 18,
+    color: '#111827',
+    fontWeight: '500',
+    marginBottom: 10,
+  },
+  proposalsSection: {
+    marginTop: 30,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    paddingBottom: 40,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  proposalInfo: {
+    color: '#6B7280',
+    fontSize: 13,
+    marginBottom: 15,
+    fontStyle: 'italic',
+  },
+  emptyProposals: {
+    padding: 30,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  emptySubText: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  emptyText: {
+    color: '#6B7280',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

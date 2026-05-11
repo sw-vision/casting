@@ -9,6 +9,27 @@ interface Props {
 }
 
 export const UserCard: React.FC<Props> = ({ user, onPress }) => {
+  const calculateAge = (dobString?: string) => {
+    if (!dobString || dobString.length !== 10) return null;
+    const parts = dobString.split('/');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+
+    const today = new Date();
+    const birthDate = new Date(year, month - 1, day);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const age = calculateAge(user.dob);
+
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.avatarContainer}>
@@ -20,7 +41,9 @@ export const UserCard: React.FC<Props> = ({ user, onPress }) => {
       </View>
       <View style={styles.info}>
         <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.role}>{user.role === 'agency' ? 'Agency' : 'Talent'}</Text>
+        <Text style={styles.role}>
+          {user.role === 'agency' ? 'Agency' : `Talent${age !== null ? ` • ${age} yrs` : ''}`}
+        </Text>
         {user.bio && (
           <Text style={styles.bio} numberOfLines={1}>
             {user.bio}

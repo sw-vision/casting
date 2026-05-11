@@ -30,9 +30,16 @@ const DEFAULT_DB: Database = {
       agencyName: 'Star Casting',
       agencyAvatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SC',
       title: 'Lead Male Actor for TVC',
-      description: 'Looking for a charismatic male actor aged 25-30 for a national electronics brand TV commercial.',
+      description: 'Looking for a charismatic male actor for a national electronics brand TV commercial.',
       location: 'Mumbai',
       budget: '₹50,000',
+      gender: 'male',
+      age: '25-30',
+      height: '175cm+',
+      weight: '70-75kg',
+      skintone: 'Fair',
+      experience: '2+ years theater/TV',
+      availability: 'Immediate',
       timestamp: Date.now() - 3600000,
     },
     {
@@ -43,7 +50,14 @@ const DEFAULT_DB: Database = {
       title: 'Supporting Actress - Web Series',
       description: 'Casting for a supporting role in an upcoming urban drama web series. Expressive eyes are a plus.',
       location: 'Bangalore',
-      budget: '₹15,000 / day',
+      budget: '₹15,000',
+      gender: 'female',
+      age: '20-25',
+      height: '160-165cm',
+      weight: '50-55kg',
+      skintone: 'Medium / Dusky',
+      experience: 'Fresher welcome',
+      availability: 'Weekends',
       timestamp: Date.now() - 7200000,
     }
   ],
@@ -54,6 +68,8 @@ const DEFAULT_DB: Database = {
       avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=SC',
       role: 'agency',
       bio: 'Leading casting agency in Mumbai with 10+ years of experience.',
+      email: 'star',
+      password: 'star',
     },
     {
       id: 'a2',
@@ -61,8 +77,8 @@ const DEFAULT_DB: Database = {
       avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=AM',
       role: 'agency',
       bio: 'Boutique talent management and production house.',
-      email: 'agency@test.com',
-      password: 'password123',
+      email: 'apex',
+      password: 'apex',
     }
   ],
   talents: [
@@ -72,8 +88,16 @@ const DEFAULT_DB: Database = {
       avatar: 'https://i.pravatar.cc/150?u=t1',
       role: 'talent',
       subscribedAgencies: ['a1'],
-      email: 'talent@test.com',
-      password: 'password123',
+      email: 'john',
+      password: 'john',
+      gender: 'male',
+      dob: '15/05/1998',
+      height: '180',
+      weight: '75',
+      skintone: 'Fair',
+      experience: '5 years theater',
+      availability: 'Full-time',
+      bio: 'Professional actor with a passion for method acting.',
     },
     {
       id: 't2',
@@ -81,6 +105,16 @@ const DEFAULT_DB: Database = {
       avatar: 'https://i.pravatar.cc/150?u=t2',
       role: 'talent',
       subscribedAgencies: ['a1', 'a2'],
+      email: 'jane',
+      password: 'jane',
+      gender: 'female',
+      dob: '22/11/2002',
+      height: '165',
+      weight: '55',
+      skintone: 'Medium',
+      experience: 'Commercials',
+      availability: 'Weekends',
+      bio: 'Commercial model and actress.',
     },
     {
       id: 't3',
@@ -88,6 +122,16 @@ const DEFAULT_DB: Database = {
       avatar: 'https://i.pravatar.cc/150?u=t3',
       role: 'talent',
       subscribedAgencies: ['a2'],
+      email: 'mike',
+      password: 'mike',
+      gender: 'male',
+      dob: '10/01/1991',
+      height: '185',
+      weight: '82',
+      skintone: 'Fair',
+      experience: 'Professional',
+      availability: 'Immediate',
+      bio: 'Experienced character actor for films.',
     },
     {
       id: 't4',
@@ -95,6 +139,135 @@ const DEFAULT_DB: Database = {
       avatar: 'https://i.pravatar.cc/150?u=t4',
       role: 'talent',
       subscribedAgencies: ['a1'],
+      email: 'sarah',
+      password: 'sarah',
+      gender: 'female',
+      dob: '05/03/2005',
+      height: '170',
+      weight: '58',
+      skintone: 'Dusky',
+      experience: 'Beginner',
+      availability: 'Part-time',
+      bio: 'Aspiring actress and student.',
+    },
+    {
+      id: 't5',
+      name: 'Bobby Junior',
+      avatar: 'https://i.pravatar.cc/150?u=t5',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'bobby',
+      password: 'bobby',
+      gender: 'child',
+      dob: '12/08/2018',
+      height: '125',
+      weight: '28',
+      skintone: 'Fair',
+      experience: 'School plays',
+      availability: 'After school',
+      bio: 'Energetic child actor for commercials.',
+    },
+    {
+      id: 't6',
+      name: 'Emily Davis',
+      avatar: 'https://i.pravatar.cc/150?u=t6',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'emily',
+      password: 'emily',
+      gender: 'female',
+      dob: '18/06/2010',
+      height: '160',
+      weight: '50',
+      skintone: 'Medium',
+      experience: 'Teen model',
+      availability: 'Weekends',
+      bio: 'Graceful teen model with a vibrant personality.',
+    },
+    {
+      id: 't7',
+      name: 'Robert Brown',
+      avatar: 'https://i.pravatar.cc/150?u=t7',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'robert',
+      password: 'robert',
+      gender: 'male',
+      dob: '30/09/1964',
+      height: '175',
+      weight: '78',
+      skintone: 'Fair',
+      experience: 'Veteran',
+      availability: 'Flexible',
+      bio: 'Veteran actor specializing in grandfatherly roles.',
+    },
+    {
+      id: 't8',
+      name: 'Lily Chen',
+      avatar: 'https://i.pravatar.cc/150?u=t8',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'lily',
+      password: 'lily',
+      gender: 'child',
+      dob: '14/02/2020',
+      height: '110',
+      weight: '20',
+      skintone: 'Fair',
+      experience: 'Beginner',
+      availability: 'Weekends',
+      bio: 'Adorable child actress with a great smile.',
+    },
+    {
+      id: 't9',
+      name: 'Marcus Stone',
+      avatar: 'https://i.pravatar.cc/150?u=t9',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'marcus',
+      password: 'marcus',
+      gender: 'male',
+      dob: '25/07/1997',
+      height: '190',
+      weight: '90',
+      skintone: 'Dark',
+      experience: 'Action/Stunts',
+      availability: 'Full-time',
+      bio: 'Physically fit actor experienced in action sequences.',
+    },
+    {
+      id: 't10',
+      name: 'Sophia Rossi',
+      avatar: 'https://i.pravatar.cc/150?u=t10',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'sophia',
+      password: 'sophia',
+      gender: 'female',
+      dob: '12/12/1981',
+      height: '168',
+      weight: '62',
+      skintone: 'Medium',
+      experience: 'TV Series',
+      availability: 'Flexible',
+      bio: 'Versatile actress with experience in family dramas.',
+    },
+    {
+      id: 't11',
+      name: 'Leo Zhang',
+      avatar: 'https://i.pravatar.cc/150?u=t11',
+      role: 'talent',
+      subscribedAgencies: ['a2'],
+      email: 'leo',
+      password: 'leo',
+      gender: 'child',
+      dob: '08/04/2016',
+      height: '140',
+      weight: '35',
+      skintone: 'Fair',
+      experience: 'Commercials',
+      availability: 'After school',
+      bio: 'Confident young actor for child-centric brands.',
     }
   ],
 };
@@ -115,29 +288,33 @@ export const StorageService = {
       if (!db.agencies || db.agencies.length === 0) db.agencies = DEFAULT_DB.agencies;
       if (!db.talents || db.talents.length === 0) db.talents = DEFAULT_DB.talents;
       
-      // Migration: Ensure test accounts exist in existing DB with correct credentials
+      // Migration: Ensure all sample talents exist and have updated credentials
       if (db.talents) {
-        const talentIndex = db.talents.findIndex((u: User) => u.email?.toLowerCase() === 'talent@test.com' || u.id === 't1');
-        if (talentIndex >= 0) {
-          if (!db.talents[talentIndex].email) {
-            db.talents[talentIndex].email = DEFAULT_DB.talents[0].email;
-            db.talents[talentIndex].password = DEFAULT_DB.talents[0].password;
+        DEFAULT_DB.talents.forEach(sampleTalent => {
+          const talentIndex = db.talents.findIndex((u: User) => u.id === sampleTalent.id);
+          if (talentIndex === -1) {
+            db.talents.push(sampleTalent);
+          } else {
+            // Force update credentials and missing fields
+            db.talents[talentIndex].email = sampleTalent.email;
+            db.talents[talentIndex].password = sampleTalent.password;
+            if (!db.talents[talentIndex].dob) db.talents[talentIndex].dob = sampleTalent.dob;
           }
-        } else {
-          db.talents.push(DEFAULT_DB.talents[0]);
-        }
+        });
       }
 
+      // Migration: Ensure all sample agencies exist and have updated credentials
       if (db.agencies) {
-        const agencyIndex = db.agencies.findIndex((u: User) => u.email?.toLowerCase() === 'agency@test.com' || u.id === 'a2');
-        if (agencyIndex >= 0) {
-          if (!db.agencies[agencyIndex].email) {
-            db.agencies[agencyIndex].email = DEFAULT_DB.agencies[1].email;
-            db.agencies[agencyIndex].password = DEFAULT_DB.agencies[1].password;
+        DEFAULT_DB.agencies.forEach(sampleAgency => {
+          const agencyIndex = db.agencies.findIndex((u: User) => u.id === sampleAgency.id);
+          if (agencyIndex === -1) {
+            db.agencies.push(sampleAgency);
+          } else {
+            // Force update credentials
+            db.agencies[agencyIndex].email = sampleAgency.email;
+            db.agencies[agencyIndex].password = sampleAgency.password;
           }
-        } else {
-          db.agencies.push(DEFAULT_DB.agencies[1]);
-        }
+        });
       }
       
       // Save back if we seeded anything

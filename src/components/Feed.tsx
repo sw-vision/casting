@@ -11,15 +11,17 @@ interface Props {
   subscribedAgencies?: string[];
   onSubscribe: (agencyId: string) => void;
   onUnsubscribe: (agencyId: string) => void;
+  userRole?: string;
 }
 
 export const Feed: React.FC<Props> = ({ 
   feedItems, 
   onRefresh, 
-  refreshing, 
+  refreshing,
   subscribedAgencies = [],
   onSubscribe,
-  onUnsubscribe
+  onUnsubscribe,
+  userRole
 }) => {
   // Helper to determine if item is a Requirement
   const isRequirement = (item: any): item is Requirement => {
@@ -38,6 +40,7 @@ export const Feed: React.FC<Props> = ({
               isSubscribed={subscribedAgencies.includes(item.agencyId)}
               onSubscribe={onSubscribe}
               onUnsubscribe={onUnsubscribe}
+              showShare={userRole === 'agency'}
             />
           );
         }

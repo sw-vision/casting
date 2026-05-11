@@ -83,6 +83,22 @@ export default function App() {
     setFeedItems(merged);
   };
 
+  const handlePostRequirement = async (reqData: Omit<Requirement, 'id' | 'timestamp' | 'agencyId' | 'agencyName' | 'agencyAvatar'>) => {
+    if (!userProfile) return;
+    const newReq: Requirement = {
+      ...reqData,
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: Date.now(),
+      agencyId: userProfile.id,
+      agencyName: userProfile.name || 'Agency',
+      agencyAvatar: userProfile.avatar,
+    };
+
+    await StorageService.addRequirement(newReq);
+    await loadData();
+    setCurrentTab('feed');
+  };
+
   const handleSubscribe = async (agencyId: string) => {
     if (!userProfile) return;
     await StorageService.subscribeToAgency(userProfile.id, agencyId);
@@ -145,9 +161,10 @@ export default function App() {
             subscribedAgencies={userProfile?.subscribedAgencies}
             onSubscribe={handleSubscribe}
             onUnsubscribe={handleUnsubscribe}
+            userRole={userProfile?.role}
           />
         ) : currentTab === 'agency' ? (
-          <AgencyScreen />
+          <AgencyScreen onRequirementPosted={handlePostRequirement} />
         ) : (
           <ProfileScreen />
         )}

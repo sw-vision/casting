@@ -25,6 +25,15 @@ export interface Requirement {
   description: string;
   location?: string;
   budget?: string;
+  gender?: 'male' | 'female' | 'child' | 'any';
+  age?: string;
+  duration?: string;
+  wagesPerDay?: string;
+  height?: string;
+  weight?: string;
+  skintone?: string;
+  experience?: string;
+  availability?: string;
   timestamp: number;
 }
 
